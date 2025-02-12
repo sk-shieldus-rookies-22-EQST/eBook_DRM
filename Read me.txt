@@ -1,0 +1,39 @@
+Packager
+
+AWS S3 접속 시 필요
+sudo apt install -y libcurl4-openssl-dev
+sudo apt install -y build-essential cmake git libssl-dev
+
+-빌드
+git clone --recurse-submodules https://github.com/awslabs/aws-sdk-cpp.git
+cd aws-sdk-cpp
+mkdir build
+cd build
+cmake .. -DBUILD_ONLY="s3" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/usr/local
+make
+sudo make install
+
+export LD_LIBRARY_PATH=/usr/local/lib:$LD_LIBRARY_PATH
+
+오라클 접속 시 필요
+sudo apt-get install libaio1
+sudo apt install unzip
+
+sudo mkdir -p /opt/oracle/instantclient
+cd /opt/oracle/instantclient
+sudo wget https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-basic-linux.x64-23.7.0.25.01.zip
+sudo wget https://download.oracle.com/otn_software/linux/instantclient/2370000/instantclient-sdk-linux.x64-23.7.0.25.01.zip
+sudo unzip instantclient-basic-linux.x64-23.7.0.25.01.zip
+sudo unzip instantclient-sdk-linux.x64-23.7.0.25.01.zip
+덮어쓰기 전부 no 선택
+
+export LD_LIBRARY_PATH=/opt/oracle/instantclient/instantclient_23_7:$LD_LIBRARY_PATH
+
+컴파일 명령어
+g++ -std=c++17 \
+  -I /opt/oracle/instantclient/instantclient_23_7/sdk/include \
+  -L /opt/oracle/instantclient/instantclient_23_7 \
+  -Wl,-rpath,/opt/oracle/instantclient/instantclient_23_7 \
+  -o packager packager.cpp \
+  -laws-cpp-sdk-s3 -laws-cpp-sdk-core -lssl -lcrypto -lstdc++fs \
+  -locci -lclntsh
